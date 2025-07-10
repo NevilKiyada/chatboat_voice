@@ -26,8 +26,16 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///chatbot.db')
+    
+    # Ensure instance path exists
+    os.makedirs(app.instance_path, exist_ok=True)
+    
+    # Set database URI to use instance folder (which is automatically created by Flask)
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', f'sqlite:///{os.path.join(app.instance_path, "chatbot.db")}')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Print the database URI for debugging
+    print(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
     
     # Enable CORS
     CORS(app)

@@ -62,12 +62,34 @@ pip install python-dotenv==1.0.0
 
 ### Runtime Issues
 
+#### ALSA Audio Issues
+
+If you see errors like `ALSA lib pcm.c:2721:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.front`:
+
+1. Use the dummy audio driver to bypass ALSA issues:
+   ```bash
+   SDL_AUDIODRIVER=dummy python app.py
+   ```
+2. Add this to your `.env` file for a permanent solution:
+   ```
+   SDL_AUDIODRIVER=dummy
+   ```
+3. If you need actual audio support, install additional ALSA packages:
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y alsa-utils libasound2-dev
+   ```
+
 #### Microphone Not Working
 
 1. Check browser permissions - allow microphone access
 2. Try a different browser (Chrome works best)
 3. Ensure your microphone is properly connected
 4. Try running with `FLASK_ENV=development` to see detailed errors
+5. Check available microphones:
+   ```bash
+   arecord -l
+   ```
 
 #### No Response from Gemini AI
 
@@ -87,6 +109,16 @@ pip install python-dotenv==1.0.0
 
 1. Ensure the `instance` directory exists and is writable
 2. Try deleting the database file `instance/chatbot.db` and restarting
+3. If you see `sqlite3.OperationalError: unable to open database file`, run our fix script:
+   ```bash
+   python fix_setup.py
+   ```
+4. Check database path in app configuration - ensure it's using `sqlite:///instance/chatbot.db`
+5. Manually create the instance directory if needed:
+   ```bash
+   mkdir -p instance
+   chmod 755 instance
+   ```
 
 ### Port Conflicts
 

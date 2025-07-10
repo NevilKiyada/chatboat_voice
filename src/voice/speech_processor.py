@@ -24,25 +24,44 @@ class SpeechProcessor:
         self.microphone = None
         self.microphone_available = False
         
-        # Try to initialize microphone (optional for voice features)
-        try:
-            self.microphone = sr.Microphone()
-            self.microphone_available = True
-            logger.info("Microphone initialized successfully")
-        except Exception as e:
-            logger.warning(f"Microphone not available: {str(e)}")
-            logger.info("Voice recording disabled - text-to-speech still available")
-        
-        # Initialize pygame mixer for audio playback
-        try:
-            pygame.mixer.init()
-        except Exception as e:
-            logger.warning(f"Audio playback initialization failed: {str(e)}")
-        
         # Audio configuration
         self.sample_rate = int(os.getenv('SAMPLE_RATE', 16000))
         self.chunk_size = int(os.getenv('CHUNK_SIZE', 1024))
         self.audio_format = os.getenv('AUDIO_FORMAT', 'wav')
+        
+        # Set environment variable to disable ALSA error messages
+        os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+        
+        # Try to initialize microphone (optional for voice features)
+        try:
+            # List available microphones before attempting to use them
+            available_mics = sr.Microphone.list_microphone_names()
+            logger.info(f"Available microphones: {available_mics}")
+            
+            if available_mics:
+                self.microphone = sr.Microphone()
+                self.microphone_available = True
+                logger.info("Microphone initialized successfully")
+            else:
+                logger.warning("No microphones detected")
+        except Exception as e:
+            logger.warning(f"Microphone initialization error: {str(e)}")
+            logger.info("Voice recording disabled - text-to-speech still available")
+        
+        # Initialize pygame mixer for audio playback with explicit fallback options
+        try:
+            # Try different driver options if available
+            try:
+                pygame.mixer.init(frequency=self.sample_rate, size=-16, channels=1)
+                logger.info("Pygame mixer initialized with default driver")
+            except:
+                # Try with dummy driver if normal initialization fails
+                os.environ['SDL_AUDIODRIVER'] = 'dummy'
+                pygame.mixer.init(frequency=self.sample_rate, size=-16, channels=1)
+                logger.info("Pygame mixer initialized with dummy driver")
+        except Exception as e:
+            logger.warning(f"Audio playback initialization failed: {str(e)}")
+            logger.info("Text-to-speech audio playback may not work properly")
         
         # Calibrate microphone if available
         if self.microphone_available:
@@ -149,14 +168,24 @@ class SpeechProcessor:
                 for service_name, service_func in recognition_services:
                     try:
                         text = service_func()
-                        if text and text.strip():
+                        # Make sure text is a string
+                        if text is not None and isinstance(text, str) and text.strip():
                             logger.info(f"Successfully transcribed with {service_name}: {text}")
                             return text.strip()
+                        elif text is not None:
+                            # Handle case where text is not a string but can be converted to one
+                            text_str = str(text)
+                            if text_str.strip():
+                                logger.info(f"Successfully transcribed with {service_name}: {text_str}")
+                                return text_str.strip()
                     except sr.UnknownValueError:
                         logger.warning(f"{service_name} could not understand audio")
                         continue
                     except sr.RequestError as e:
                         logger.warning(f"{service_name} service error: {str(e)}")
+                        continue
+                    except AttributeError as e:
+                        logger.warning(f"{service_name} returned non-string that can't be processed: {e}")
                         continue
                 
                 # If all services failed
@@ -181,8 +210,14 @@ class SpeechProcessor:
             logger.info("Processing audio...")
             text = self.recognizer.recognize_google(audio_data)
             
-            logger.info(f"Transcribed: {text[:50]}...")
-            return text
+            # Ensure text is a string type
+            if isinstance(text, str):
+                logger.info(f"Transcribed: {text[:50]}...")
+                return text
+            else:
+                logger.warning(f"Received non-string response: {type(text)}")
+                # Convert to string if possible
+                return str(text) if text is not None else None
             
         except sr.WaitTimeoutError:
             logger.warning("Recording timeout")
