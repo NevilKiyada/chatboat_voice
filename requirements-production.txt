@@ -1,0 +1,36 @@
+# Production Requirements
+# Core Web Framework
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-SQLAlchemy==3.0.5
+
+# AI Integration
+google-generativeai==0.3.2
+
+# Voice Processing
+SpeechRecognition==3.10.0
+gtts==2.4.0
+PyAudio==0.2.14
+pydub==0.25.1
+
+# Database
+SQLAlchemy==2.0.23
+
+# Environment and Configuration
+python-dotenv==1.0.0
+
+# Utilities
+requests==2.31.0
+
+# Logging
+colorlog==6.7.0
+
+# Production Enhancements
+gunicorn==21.2.0
+gevent==23.9.1
+
+# Security
+Werkzeug==2.3.7
+
+# Monitoring and Health Checks
+psutil==5.9.6

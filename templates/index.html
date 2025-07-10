@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: #f8f9fa;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+
+        .input-container {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .message-input:focus {
+            border-color: #007bff;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-voice {
+            background: #28a745;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-voice:hover {
+            background: #1e7e34;
+            transform: scale(1.1);
+        }
+
+        .btn-voice.recording {
+            background: #dc3545;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🎤 Voice Chatbot</h1>
+            <p>Chat with AI using text or voice</p>
+            <div class="status-indicator status-online" id="statusIndicator">Online</div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                👋 Hello! I'm your voice assistant. You can type or click the microphone to speak with me.
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Processing...
+        </div>
+        
+        <div class="input-container">
+            <input type="text" class="message-input" id="messageInput" placeholder="Type your message..." />
+            <button class="btn btn-primary" id="sendBtn">Send</button>
+            <button class="btn btn-voice" id="voiceBtn" title="Click to record voice">
+                🎤
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class VoiceChatbot {
+            constructor() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.voiceBtn = document.getElementById('voiceBtn');
+                this.loading = document.getElementById('loading');
+                this.statusIndicator = document.getElementById('statusIndicator');
+                
+                this.isRecording = false;
+                this.mediaRecorder = null;
+                this.audioChunks = [];
+                
+                this.initializeEventListeners();
+                this.checkServerStatus();
+                this.checkMicrophoneSupport();
+            }
+            
+            async checkMicrophoneSupport() {
+                try {
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        this.voiceBtn.disabled = true;
+                        this.voiceBtn.title = 'Microphone not supported in this browser';
+                        this.voiceBtn.style.opacity = '0.5';
+                        console.warn('MediaDevices API not supported');
+                        return;
+                    }
+                    
+                    // Check if we can enumerate devices
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const hasAudioInput = devices.some(device => device.kind === 'audioinput');
+                    
+                    if (!hasAudioInput) {
+                        this.voiceBtn.disabled = true;
+                        this.voiceBtn.title = 'No microphone detected';
+                        this.voiceBtn.style.opacity = '0.5';
+                        console.warn('No audio input devices found');
+                    } else {
+                        console.log('Microphone support detected');
+                    }
+                } catch (error) {
+                    console.warn('Could not check microphone support:', error);
+                }
+            }
+            
+            initializeEventListeners() {
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                this.voiceBtn.addEventListener('click', () => this.toggleVoiceRecording());
+            }
+            
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+                
+                this.addMessage(message, 'user');
+                this.messageInput.value = '';
+                this.showLoading(true);
+                
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        this.addMessage(data.response, 'bot');
+                    } else {
+                        this.showError(data.error || 'Failed to send message');
+                    }
+                } catch (error) {
+                    this.showError('Network error. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            async toggleVoiceRecording() {
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    await this.startRecording();
+                }
+            }
+            
+            async startRecording() {
+                try {
+                    // Request microphone permissions explicitly
+                    console.log('Requesting microphone access...');
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            sampleRate: 16000
+                        } 
+                    });
+                    
+                    console.log('Microphone access granted');
+                    this.mediaRecorder = new MediaRecorder(stream, {
+                        mimeType: 'audio/webm' // Better browser support
+                    });
+                    this.audioChunks = [];
+                    
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            this.audioChunks.push(event.data);
+                        }
+                    };
+                    
+                    this.mediaRecorder.onstop = () => {
+                        this.processVoiceRecording();
+                    };
+                    
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    this.voiceBtn.classList.add('recording');
+                    this.voiceBtn.textContent = '⏹️';
+                    this.voiceBtn.title = 'Click to stop recording';
+                    
+                    console.log('Recording started');
+                    
+                } catch (error) {
+                    console.error('Microphone access error:', error);
+                    if (error.name === 'NotAllowedError') {
+                        this.showError('Microphone access denied. Please allow microphone access and try again.');
+                    } else if (error.name === 'NotFoundError') {
+                        this.showError('No microphone found. Please connect a microphone and try again.');
+                    } else {
+                        this.showError('Microphone access failed: ' + error.message);
+                    }
+                }
+            }
+            
+            stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                    this.isRecording = false;
+                    this.voiceBtn.classList.remove('recording');
+                    this.voiceBtn.textContent = '🎤';
+                    this.voiceBtn.title = 'Click to record voice';
+                }
+            }
+            
+            async processVoiceRecording() {
+                this.showLoading(true);
+                
+                try {
+                    const audioBlob = new Blob(this.audioChunks, { 
+                        type: this.mediaRecorder.mimeType || 'audio/webm' 
+                    });
+                    
+                    console.log('Audio blob created:', {
+                        size: audioBlob.size,
+                        type: audioBlob.type
+                    });
+                    
+                    if (audioBlob.size === 0) {
+                        this.showError('No audio data recorded. Please try again.');
+                        return;
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('audio', audioBlob, 'recording.webm');
+                    
+                    console.log('Sending audio to server...');
+                    const response = await fetch('/api/voice/record', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    console.log('Server response:', data);
+                    
+                    if (response.ok && data.transcription) {
+                        this.messageInput.value = data.transcription;
+                        this.addMessage(`🎤 "${data.transcription}"`, 'user');
+                        
+                        // Automatically send the transcribed message
+                        setTimeout(() => this.sendMessage(), 500);
+                    } else {
+                        this.showError(data.error || 'Failed to transcribe audio');
+                    }
+                } catch (error) {
+                    console.error('Voice processing error:', error);
+                    this.showError('Failed to process voice recording: ' + error.message);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                messageDiv.textContent = content;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+            
+            showLoading(show) {
+                this.loading.style.display = show ? 'block' : 'none';
+            }
+            
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = `Error: ${message}`;
+                
+                this.chatMessages.appendChild(errorDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                
+                // Remove error message after 5 seconds
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.parentNode.removeChild(errorDiv);
+                    }
+                }, 5000);
+            }
+            
+            async checkServerStatus() {
+                try {
+                    const response = await fetch('/api/health');
+                    if (response.ok) {
+                        this.statusIndicator.className = 'status-indicator status-online';
+                        this.statusIndicator.textContent = 'Online';
+                    } else {
+                        throw new Error('Server not responding');
+                    }
+                } catch (error) {
+                    this.statusIndicator.className = 'status-indicator status-offline';
+                    this.statusIndicator.textContent = 'Offline';
+                }
+            }
+        }
+        
+        // Initialize the chatbot when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new VoiceChatbot();
+        });
+    </script>
+</body>
+</html>
