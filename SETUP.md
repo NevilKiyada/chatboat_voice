@@ -2,54 +2,70 @@
 
 ## 🎯 Quick Setup
 
-### 1. Run Setup Script
-The easiest way to set up the project:
+### 1. Create Python Virtual Environment
 ```bash
-# Make scripts executable
-chmod +x setup.sh start.sh
+# For Linux/macOS
+python3 -m venv venv
+source venv/bin/activate
 
-# Run setup script
-./setup.sh
+# For Windows
+python -m venv venv
+venv\Scripts\activate
 ```
 
-### 2. Configure Your API Key
-Edit the `.env` file and add your Gemini API key:
+### 2. Install Dependencies
 ```bash
-GEMINI_API_KEY=your_gemini_api_key_here
+# Upgrade pip first
+pip install --upgrade pip
+
+# Install all required packages
+pip install -r requirements.txt
+```
+
+### 3. Configure Your API Key
+Create an environment file and add your Gemini API key:
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env and add your API key
+# GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 **Get your API key**: https://aistudio.google.com/
 
-### 3. Install System Dependencies (if needed)
-For audio support on Linux:
+### 4. Create Required Directories
+```bash
+# Create necessary directories for the application
+mkdir -p audio_files static/audio logs instance
+```
+
+### 5. Install System Dependencies (if needed)
+
+#### For Linux:
 ```bash
 sudo apt-get update
 sudo apt-get install portaudio19-dev python3-pyaudio
 ```
 
-For macOS:
+#### For macOS:
 ```bash
 brew install portaudio
 ```
 
-For Windows:
+#### For Windows:
+If you encounter issues with PyAudio:
 ```powershell
 pip install pipwin
 pipwin install pyaudio
 ```
 
-### 4. Start the Application
+### 6. Start the Application
 ```bash
-./start.sh
-```
-
-Or manually:
-```bash
-source venv/bin/activate
 python app.py
 ```
 
-### 5. Open in Browser
+### 7. Open in Browser
 Navigate to: http://localhost:5000
 
 ## 🎤 Using the Voice Chatbot

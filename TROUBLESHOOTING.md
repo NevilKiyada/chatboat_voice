@@ -2,36 +2,63 @@
 
 ## Common Issues and Solutions
 
-### Installation Problems
+### Missing Dependencies
 
-#### PyAudio Installation Fails
+#### ModuleNotFoundError: No module named 'pygame'
+
+If you see this error, pygame is missing from your installation:
+
+```bash
+pip install pygame==2.5.2
+```
+
+#### ModuleNotFoundError: No module named 'pyaudio'
+
+PyAudio installation often requires system libraries:
 
 **Linux Solution:**
 ```bash
 sudo apt-get update
 sudo apt-get install portaudio19-dev python3-pyaudio
-pip install pyaudio
+pip install pyaudio==0.2.14
 ```
 
 **macOS Solution:**
 ```bash
 brew install portaudio
-pip install pyaudio
+pip install pyaudio==0.2.14
 ```
 
 **Windows Solution:**
-```
+```powershell
 pip install pipwin
 pipwin install pyaudio
 ```
 
-#### Dependencies Installation Errors
+#### Other Missing Modules
 
-If you see errors during dependency installation:
+Make sure you installed all requirements:
 
-1. Make sure you're using Python 3.9 or later
-2. Try updating pip: `pip install --upgrade pip`
-3. Install dependencies one by one to identify problematic packages
+```bash
+pip install -r requirements.txt
+```
+
+### Environment Setup Issues
+
+If you're missing dependencies after installation, try installing packages one by one:
+
+```bash
+pip install Flask==2.3.3
+pip install Flask-CORS==4.0.0
+pip install Flask-SQLAlchemy==3.0.5
+pip install google-generativeai==0.3.2
+pip install SpeechRecognition==3.10.0
+pip install gtts==2.4.0
+pip install PyAudio==0.2.14
+pip install pydub==0.25.1
+pip install pygame==2.5.2
+pip install python-dotenv==1.0.0
+```
 
 ### Runtime Issues
 

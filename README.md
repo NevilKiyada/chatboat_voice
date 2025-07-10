@@ -24,48 +24,38 @@
 
 ## 🚀 Quick Start
 
+### Linux/macOS Setup
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/NevilKiyada/chatboat_voice.git
 cd chatboat_voice
 
-# 2. Run the setup script
-./setup.sh
+# 2. Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-# 3. Add your Gemini API key
-# Edit the .env file and add your API key from https://aistudio.google.com/
-# GEMINI_API_KEY=your_key_here
+# 3. Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
 
-# 4. Start the application
-./start.sh
+# 4. Create required directories
+mkdir -p audio_files static/audio logs instance
 
-# 5. Open in your browser
+# 5. Set up environment file
+cp .env.example .env
+# Edit .env and add your Gemini API key from https://aistudio.google.com/
+
+# 6. Run the application
+python app.py  # Standard way to run
+# OR
+python run_app.py  # Helper script with extra checks
+
+# 7. Open in your browser
 # http://localhost:5000
 ```
 
-### Manual Setup (Alternative)
-
-```bash
-# 1. Clone repository
-git clone https://github.com/NevilKiyada/chatboat_voice.git
-cd chatboat_voice
-
-# 2. Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Set up environment variables
-cp .env.example .env
-# Edit .env with your Gemini API key
-
-# 5. Run the application
-python app.py
-```
-
-### Windows-Specific Setup
+### Windows Setup
 
 ```powershell
 # 1. Clone repository
@@ -74,19 +64,66 @@ cd chatboat_voice
 
 # 2. Create virtual environment
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\activate
 
 # 3. Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# 4. Create .env file with your Gemini API key
-# GEMINI_API_KEY=your_key_here
-# FLASK_ENV=development
-# DEBUG=True
+# 4. Create required directories
+mkdir -p audio_files static/audio logs instance
 
-# 5. Run the application
-python app.py
+# 5. Create .env file
+copy .env.example .env
+# Edit .env and add your Gemini API key from https://aistudio.google.com/
+
+# 6. Run the application
+python app.py  # Standard way to run
+# OR
+python run_app.py  # Helper script with extra checks
+
+# 7. Open in your browser
+# http://localhost:5000
 ```
+
+### Alternative Setup (If You Have Dependency Issues)
+
+We've created a helper script that will install all dependencies one by one and handle platform-specific installations:
+
+```bash
+# Run the helper script
+python install_dependencies.py
+```
+
+This script will:
+1. Install all required packages one by one
+2. Handle PyAudio installation for your specific platform
+3. Create necessary directories
+4. Set up a default .env file
+
+### System Dependencies
+
+#### For PyAudio on Linux:
+```bash
+sudo apt-get update
+sudo apt-get install portaudio19-dev python3-pyaudio
+```
+
+#### For PyAudio on macOS:
+```bash
+brew install portaudio
+```
+
+#### For PyAudio on Windows:
+If you encounter issues installing PyAudio, try:
+```powershell
+pip install pipwin
+pipwin install pyaudio
+```
+
+### Troubleshooting
+
+If you encounter any issues, please check the [TROUBLESHOOTING.md](TROUBLESHOOTING.md) file for detailed solutions.
 
 ## 📋 Requirements
 

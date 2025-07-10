@@ -25,6 +25,7 @@ SpeechRecognition==3.10.0  # Speech-to-text conversion
 gtts==2.4.0               # Google Text-to-Speech
 PyAudio==0.2.14           # Audio recording/playback 
 pydub==0.25.1             # Audio file manipulation
+pygame==2.5.2             # Audio playback for TTS
 
 # ----------------
 # Database
