@@ -4,7 +4,6 @@
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![AI](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)
 
 **A modern voice-enabled AI chatbot with speech recognition and natural language processing**
@@ -20,35 +19,36 @@
 � **Text-to-Speech** - Natural voice responses  
 💾 **Chat History** - Persistent conversation storage  
 🌐 **Modern Web UI** - Beautiful, responsive interface  
-🐳 **Docker Ready** - One-command deployment  
-📱 **Mobile Friendly** - Works on all devices  
+ **Mobile Friendly** - Works on all devices  
 🔒 **Production Ready** - Security, monitoring, and more
 
 ## 🚀 Quick Start
 
-### Option 1: Docker (Recommended)
-
 ```bash
 # 1. Clone the repository
 git clone https://github.com/NevilKiyada/chatboat_voice.git
-cd voice-chatbot
+cd chatboat_voice
 
-# 2. Set up environment
-cp .env.example .env
-# Edit .env with your Gemini API key
+# 2. Run the setup script
+./setup.sh
 
-# 3. Deploy with Docker
-./setup-docker.sh
+# 3. Add your Gemini API key
+# Edit the .env file and add your API key from https://aistudio.google.com/
+# GEMINI_API_KEY=your_key_here
 
-# 4. Open http://localhost:5000
+# 4. Start the application
+./start.sh
+
+# 5. Open in your browser
+# http://localhost:5000
 ```
 
-### Option 2: Manual Setup
+### Manual Setup (Alternative)
 
 ```bash
-# 1. Clone and setup
+# 1. Clone repository
 git clone https://github.com/NevilKiyada/chatboat_voice.git
-cd voice-chatbot
+cd chatboat_voice
 
 # 2. Create virtual environment
 python3 -m venv venv
@@ -57,9 +57,32 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Set up environment
+# 4. Set up environment variables
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env with your Gemini API key
+
+# 5. Run the application
+python app.py
+```
+
+### Windows-Specific Setup
+
+```powershell
+# 1. Clone repository
+git clone https://github.com/NevilKiyada/chatboat_voice.git
+cd chatboat_voice
+
+# 2. Create virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Create .env file with your Gemini API key
+# GEMINI_API_KEY=your_key_here
+# FLASK_ENV=development
+# DEBUG=True
 
 # 5. Run the application
 python app.py
@@ -67,7 +90,7 @@ python app.py
 
 ## 📋 Requirements
 
-- **Docker & Docker Compose** (recommended) OR Python 3.11+
+- **Python 3.11+**
 - **Google Gemini API key** - Free from [Google AI Studio](https://aistudio.google.com/)
 - **Microphone access** - For voice input features
 - **Modern web browser** - Chrome, Firefox, Safari, Edge
@@ -83,17 +106,26 @@ python app.py
 ## 🏗️ Project Structure
 
 ```
-voice-chatbot/
-├── 🐳 Docker Configuration
-│   ├── Dockerfile              # Production container
-│   ├── docker-compose.yml      # Service orchestration
-│   └── .dockerignore           # Build optimization
+chatboat_voice/
 ├── 🚀 Application
-│   ├── app.py                  # Main Flask app
-│   ├── app_production.py       # Production version
-│   └── requirements*.txt       # Dependencies
+│   ├── app.py                  # Main Flask application
+│   ├── setup.sh                # Easy setup script
+│   ├── start.sh                # Start the application
+│   └── requirements.txt        # All dependencies
 ├── 🧠 Source Code
 │   └── src/
+│       ├── api/                # AI integration with Gemini
+│       ├── voice/              # Speech recognition & TTS
+│       ├── database/           # Database management
+│       ├── models/             # Data models
+│       └── utils/              # Utilities and logging
+├── 🗃️ Data
+│   ├── instance/               # SQLite database
+│   └── logs/                   # Application logs
+├── 🌐 Web
+│   ├── static/                 # Static assets
+│   │   └── audio/              # Generated audio files
+│   └── templates/              # HTML templates
 │       ├── api/                # AI integration
 │       ├── voice/              # Speech processing
 │       ├── database/           # Data management

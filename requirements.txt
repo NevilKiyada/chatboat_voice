@@ -1,25 +1,60 @@
+# ================================================
+# VOICE CHATBOT - REQUIREMENTS
+# ================================================
+# This file contains all dependencies needed to run the Voice Chatbot
+# Compatible with Python 3.9+ on Windows, macOS, and Linux
+# ================================================
+
+# ----------------
 # Core Web Framework
+# ----------------
 Flask==2.3.3
 Flask-CORS==4.0.0
 Flask-SQLAlchemy==3.0.5
+Werkzeug==2.3.7  # Security-patched version
 
+# ----------------
 # AI Integration
-google-generativeai==0.3.2
+# ----------------
+google-generativeai==0.3.2  # Google Gemini AI API
 
+# ----------------
 # Voice Processing
-SpeechRecognition==3.10.0
-gtts==2.4.0
-PyAudio==0.2.14
-pydub==0.25.1
+# ----------------
+SpeechRecognition==3.10.0  # Speech-to-text conversion
+gtts==2.4.0               # Google Text-to-Speech
+PyAudio==0.2.14           # Audio recording/playback 
+pydub==0.25.1             # Audio file manipulation
 
+# ----------------
 # Database
-SQLAlchemy==2.0.23
+# ----------------
+SQLAlchemy==2.0.23        # ORM for database operations
 
+# ----------------
 # Environment and Configuration
-python-dotenv==1.0.0
+# ----------------
+python-dotenv==1.0.0      # Load environment variables
 
+# ----------------
 # Utilities
-requests==2.31.0
+# ----------------
+requests==2.31.0          # HTTP requests
 
+# ----------------
 # Logging
-colorlog==6.7.0
+# ----------------
+colorlog==6.7.0           # Colored console logging
+
+# ----------------
+# Production Enhancements (optional but recommended)
+# ----------------
+gunicorn==21.2.0          # Production WSGI server
+gevent==23.9.1            # Async worker for Gunicorn
+psutil==5.9.6             # System monitoring utilities
+
+# ------------------------------------------------
+# INSTALLATION NOTES:
+# - For PyAudio on Linux: sudo apt-get install portaudio19-dev python3-pyaudio
+# - For PyAudio on macOS: brew install portaudio
+# ------------------------------------------------

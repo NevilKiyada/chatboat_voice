@@ -45,24 +45,7 @@ def check_environment():
     
     return True
 
-def check_docker_files():
-    """Check Docker-related files"""
-    print("\n🐳 Checking Docker Configuration...")
-    
-    files = [
-        ('Dockerfile', 'Docker image definition'),
-        ('docker-compose.yml', 'Docker Compose configuration'),
-        ('.dockerignore', 'Docker ignore file'),
-        ('setup-docker.sh', 'Docker setup script'),
-        ('chatbot.sh', 'Management script')
-    ]
-    
-    all_good = True
-    for file_path, description in files:
-        if not check_file_exists(file_path, description):
-            all_good = False
-    
-    return all_good
+# Docker configuration check has been removed
 
 def check_source_code():
     """Check source code structure"""
@@ -114,7 +97,7 @@ def check_scripts_executable():
     """Check if scripts are executable"""
     print("\n🔧 Checking Script Permissions...")
     
-    scripts = ['setup-docker.sh', 'chatbot.sh']
+    scripts = ['start.sh']
     
     for script in scripts:
         if Path(script).exists():
@@ -164,7 +147,6 @@ def main():
     
     checks = [
         check_environment(),
-        check_docker_files(),
         check_source_code(),
         check_directories(),
         test_imports()
@@ -178,13 +160,12 @@ def main():
         print("🎉 ALL CHECKS PASSED!")
         print("")
         print("Your Voice Chatbot is ready for:")
-        print("✅ Docker deployment")
         print("✅ Sharing with others")
-        print("✅ GitHub publication")
+        print("✅ Local deployment")
         print("")
         print("Next steps:")
-        print("1. Run: ./setup-docker.sh")
-        print("2. Or follow GITHUB_SETUP.md to publish")
+        print("1. Run: python app.py")
+        print("2. Access the chatbot at http://localhost:5000")
         print("")
         return True
     else:

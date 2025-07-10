@@ -2,15 +2,25 @@
 
 ## 🎯 Quick Setup
 
-### 1. Configure Your API Key
+### 1. Run Setup Script
+The easiest way to set up the project:
+```bash
+# Make scripts executable
+chmod +x setup.sh start.sh
+
+# Run setup script
+./setup.sh
+```
+
+### 2. Configure Your API Key
 Edit the `.env` file and add your Gemini API key:
 ```bash
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-**Get your API key**: https://makersuite.google.com/app/apikey
+**Get your API key**: https://aistudio.google.com/
 
-### 2. Install System Dependencies (if needed)
+### 3. Install System Dependencies (if needed)
 For audio support on Linux:
 ```bash
 sudo apt-get update
@@ -22,7 +32,13 @@ For macOS:
 brew install portaudio
 ```
 
-### 3. Start the Application
+For Windows:
+```powershell
+pip install pipwin
+pipwin install pyaudio
+```
+
+### 4. Start the Application
 ```bash
 ./start.sh
 ```
@@ -33,7 +49,7 @@ source venv/bin/activate
 python app.py
 ```
 
-### 4. Open in Browser
+### 5. Open in Browser
 Navigate to: http://localhost:5000
 
 ## 🎤 Using the Voice Chatbot
