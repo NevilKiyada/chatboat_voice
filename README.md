@@ -30,7 +30,7 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR-USERNAME/voice-chatbot.git
+git clone https://github.com/NevilKiyada/chatboat_voice.git
 cd voice-chatbot
 
 # 2. Set up environment
@@ -47,7 +47,7 @@ cp .env.example .env
 
 ```bash
 # 1. Clone and setup
-git clone https://github.com/YOUR-USERNAME/voice-chatbot.git
+git clone https://github.com/NevilKiyada/chatboat_voice.git
 cd voice-chatbot
 
 # 2. Create virtual environment
