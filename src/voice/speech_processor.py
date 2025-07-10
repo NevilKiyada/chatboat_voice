@@ -18,8 +18,48 @@ logger = logging.getLogger(__name__)
 class SpeechProcessor:
     """Handles speech recognition and text-to-speech conversion"""
     
+    def _configure_audio_environment(self):
+        """Configure audio environment to avoid errors"""
+        # Hide pygame welcome message
+        os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+        
+        # Use dummy audio driver if set in environment or if we're on Linux without audio
+        if os.environ.get('SDL_AUDIODRIVER') == 'dummy':
+            logger.info("Using dummy audio driver from environment variable")
+        else:
+            # Check if we need to use dummy driver
+            try:
+                import platform
+                if platform.system() == 'Linux':
+                    # Try to detect if ALSA is properly configured
+                    alsa_devices = os.path.exists('/proc/asound/cards')
+                    if not alsa_devices:
+                        logger.info("No ALSA sound cards detected, using dummy driver")
+                        os.environ['SDL_AUDIODRIVER'] = 'dummy'
+            except Exception as e:
+                logger.warning(f"Error during audio environment check: {e}")
+        
+        # Configure pygame audio with error handling
+        try:
+            import pygame
+            pygame.mixer.init(frequency=int(os.getenv('SAMPLE_RATE', 16000)), size=-16, channels=1)
+            logger.info("Pygame mixer initialized successfully")
+        except Exception as e:
+            logger.warning(f"Pygame mixer initialization failed: {e}")
+            logger.info("Trying with dummy driver...")
+            try:
+                os.environ['SDL_AUDIODRIVER'] = 'dummy'
+                pygame.mixer.init(frequency=int(os.getenv('SAMPLE_RATE', 16000)), size=-16, channels=1)
+                logger.info("Pygame mixer initialized with dummy driver")
+            except Exception as dummy_error:
+                logger.error(f"Pygame mixer initialization failed with dummy driver: {dummy_error}")
+    
     def __init__(self):
         """Initialize the speech processor"""
+        # Configure audio environment first to avoid errors
+        self._configure_audio_environment()
+        
+        # Initialize speech recognition
         self.recognizer = sr.Recognizer()
         self.microphone = None
         self.microphone_available = False
@@ -29,14 +69,15 @@ class SpeechProcessor:
         self.chunk_size = int(os.getenv('CHUNK_SIZE', 1024))
         self.audio_format = os.getenv('AUDIO_FORMAT', 'wav')
         
-        # Set environment variable to disable ALSA error messages
-        os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-        
         # Try to initialize microphone (optional for voice features)
         try:
             # List available microphones before attempting to use them
-            available_mics = sr.Microphone.list_microphone_names()
-            logger.info(f"Available microphones: {available_mics}")
+            try:
+                available_mics = sr.Microphone.list_microphone_names()
+                logger.info(f"Available microphones: {available_mics}")
+            except Exception as mic_error:
+                logger.warning(f"Failed to list microphones: {mic_error}")
+                available_mics = []
             
             if available_mics:
                 self.microphone = sr.Microphone()
